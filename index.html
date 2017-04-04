@@ -39,7 +39,12 @@
 					<tr><th>ID</th><th>Name</th><th>Contact</th><th>&nbsp;</th></tr>
 				</thead>
 				<tbody>
-					
+					<tr ng-repeat="row in contacts">
+						<td>{{row.id}}</td>
+						<td>{{row.name}}</td>
+						<td>{{row.contact}}</td>
+						<td>&nbsp;</td>
+					</tr>
 				</tbody>
 			</table>		
 		</div>
@@ -57,21 +62,23 @@
 		
 		app.controller('myAppCtrl',function($http,$scope) {
 
-			$scope.contact = {
+			$scope.contact = { // basic form
 				id: 0,
 				name: '',
 				contact: ''
 			};
 
+			$scope.contacts = []; // for tabular
+			
 			$scope.save = function() {
 				
 				$http({
 				  method: 'POST',
-				  url: 'handlers/profile.php',
-				  data: {}
+				  url: 'handlers/contact.php',
+				  data: $scope.contact
 				}).then(function mySucces(response) {
 					
-					
+					$scope.list();
 					
 				}, function myError(response) {
 					 
@@ -80,6 +87,25 @@
 				});				
 				
 			};
+			
+			$scope.list = function() {
+				
+				$http({
+				  method: 'POST',
+				  url: 'handlers/list.php'
+				}).then(function mySucces(response) {
+					
+					$scope.contacts = response.data;
+					
+				}, function myError(response) {
+					 
+				  // error
+					
+				});					
+				
+			};
+			
+			$scope.list();
 		
 		});		
 	
