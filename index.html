@@ -21,14 +21,16 @@
   <div class="container">
 	<div class="row" style="margin-top: 50px;">
 		<div class="col-lg-6">
-			<form>
-			  <div class="form-group">
+			<form name="frmContact">
+			  <div class="form-group" ng-class="{'has-error': frmContact.name.$invalid && frmContact.name.$touched}">
 				<label>Name</label>
-				<input type="text" class="form-control" ng-model="contact.name" placeholder="">
+				<input type="text" class="form-control" name="name" ng-model="contact.name" placeholder="" required>
+				<p class="text-danger" ng-show="frmContact.name.$invalid && frmContact.name.$touched">Name is required</p>
 			  </div>
-			  <div class="form-group">
+			  <div class="form-group" ng-class="{'has-error': frmContact.contact.$invalid && frmContact.contact.$touched}">
 				<label>Contact</label>
-				<input type="text" class="form-control" ng-model="contact.contact" placeholder="">
+				<input type="number" class="form-control" name="contact" ng-model="contact.contact" placeholder="" required>
+				<p class="text-danger" ng-show="frmContact.contact.$invalid && frmContact.contact.$touched">Contact is required</p>				
 			  </div>			  
 			  <button type="button" class="btn btn-default" ng-click="save()">Save</button>
 			</form>		
@@ -43,7 +45,10 @@
 						<td>{{row.id}}</td>
 						<td>{{row.name}}</td>
 						<td>{{row.contact}}</td>
-						<td>&nbsp;</td>
+						<td>
+							<button type="button" class="btn btn-primary btn-xs" ng-click="edit(row)">Edit</button>
+							<button type="button" class="btn btn-default btn-xs" ng-click="del(row)">Delete</button>							
+						</td>
 					</tr>
 				</tbody>
 			</table>		
@@ -67,16 +72,82 @@
 				name: '',
 				contact: ''
 			};
+			
+			$scope.bcontact = { // basic form
+				id: 0,
+				name: '',
+				contact: ''
+			};			
 
 			$scope.contacts = []; // for tabular
 			
+			$scope.edit = function(row) {
+				
+				$http({
+				  method: 'POST',
+				  url: 'handlers/edit.php',
+				  data: {id: row.id}
+				}).then(function mySucces(response) {
+					
+					$scope.contact = response.data;
+					
+				}, function myError(response) {
+					 
+				  // error
+					
+				});					
+				
+			};
+			
+			$scope.del = function(row) {
+				
+				$http({
+				  method: 'POST',
+				  url: 'handlers/del.php',
+				  data: {id: [row.id]}
+				}).then(function mySucces(response) {
+					
+					$scope.list();				
+					
+				}, function myError(response) {
+					 
+				  // error
+					
+				});					
+				
+			}
+			
+			$scope.required = ['name','contact'];
+			
 			$scope.save = function() {
+			
+				if ($scope.frmContact.$invalid) {
+					
+					var valid = true;
+					
+					angular.forEach($scope.required,function(item,i) {
+						if ($scope.contact[item] == '') {
+							$scope.frmContact[item].$invalid = true;
+							$scope.frmContact[item].$touched = true;
+							valid = false;
+						}
+					});
+					
+					if (!valid) return;
+				}
+
+				angular.forEach($scope.required,function(item,i) {
+					$scope.frmContact[item].$invalid = false;
+					$scope.frmContact[item].$touched = false;
+				});			
 				
 				$http({
 				  method: 'POST',
 				  url: 'handlers/contact.php',
 				  data: $scope.contact
 				}).then(function mySucces(response) {
+					
+					angular.copy($scope.bcontact,$scope.contact);
 					
 					$scope.list();
 					
@@ -101,7 +172,7 @@
 					 
 				  // error
 					
-				});					
+				});				
 				
 			};
 			

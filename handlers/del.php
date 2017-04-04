@@ -6,11 +6,6 @@ require_once '../db.php';
 
 $con = new pdo_db("contacts");
 
-if ($_POST['id'] == 0) {
-	unset($_POST['id']);
-	$con->insertData($_POST);
-} else {
-	$con->updateData($_POST,'id');	
-}
+$con->deleteData(array("id"=>implode(",",$_POST['id'])));
 
 ?>
