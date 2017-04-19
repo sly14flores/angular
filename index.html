@@ -36,12 +36,13 @@
 			</form>		
 		</div>
 		<div class="col-lg-6">
+			<input type="text" class="form-control" placeholder="Search" ng-model="str">
 			<table class="table table-striped">
 				<thead>
 					<tr><th>ID</th><th>Name</th><th>Contact</th><th>&nbsp;</th></tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="row in contacts">
+					<tr ng-repeat="row in contacts | filter:str">
 						<td>{{row.id}}</td>
 						<td>{{row.name}}</td>
 						<td>{{row.contact}}</td>
